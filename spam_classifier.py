@@ -9,16 +9,22 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import StratifiedKFold, cross_validate, train_test_split
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import FeatureUnion, Pipeline
 
 URL = "https://raw.githubusercontent.com/justmarkham/pycon-2016-tutorial/master/data/sms.tsv"
 MODEL_PATH = Path(__file__).with_name("spam_model.pkl")
 
 
 def make_pipeline():
+    # Word features (single words and pairs) plus character n-grams, which help
+    # catch spammy spellings such as "FREE!!!", "txt" or "claim4".
+    features = FeatureUnion([
+        ("words", TfidfVectorizer(ngram_range=(1, 2))),
+        ("chars", TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 5), sublinear_tf=True)),
+    ])
     return Pipeline([
-        ("vectorizer", TfidfVectorizer(stop_words="english")),
-        ("classifier", LogisticRegression(class_weight="balanced", random_state=42)),
+        ("features", features),
+        ("classifier", LogisticRegression(class_weight="balanced", max_iter=1000, random_state=42)),
     ])
 
 
