@@ -1,7 +1,16 @@
 __pycache__/
-*.pyc
+*.py[cod]
 .venv/
 venv/
 .env
+.ipynb_checkpoints/
+.pytest_cache/
 .DS_Store
+
+# trained models and plots generated in the project root
+# (the plots in docs/ are committed on purpose)
+*.joblib
 *.pkl
+/confusion_matrix.png
+/pr_curve.png
+/calibration.png
